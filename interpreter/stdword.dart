@@ -130,7 +130,8 @@ final Map<String, Function> words = {
   ...base,
   ...io,
   ...cast,
-  ...arrayWords
+  ...arrayWords,
+  ...stringWords
 };
 
 final Map<String, Function> lazy = {
@@ -214,5 +215,14 @@ final Map<String, Function> arrayWords = {
   'first': (BVM vm) {
     var array = vm.stack.pop().value as List<BObject>;
     vm.stack.push(array.first);
+  }
+};
+
+final Map<String, Function> stringWords = {
+  'concat': (BVM vm) {
+    // [string string] top
+    var str2 = vm.stack.pop().value as String;
+    var str1 = vm.stack.pop().value as String;
+    vm.stack.push(BObject(str1 + str2));
   }
 };

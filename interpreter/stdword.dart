@@ -3,6 +3,9 @@ import 'core/block.dart';
 import 'core/object.dart';
 import 'lexer.dart';
 
+const TRUE = 1;
+const FALSE = 0;
+
 final Map<String, Function> words = {
   'dup': (BVM vm) {
     vm.stack.push(vm.stack.peek());
@@ -117,7 +120,8 @@ final Map<String, Function> words = {
     var block = vm.stack.pop().value as List<Token>;
     vm.stack.push(BlockObject(block, vm.frames.peekFrame()));
   },
-  ...lazy
+  ...lazy,
+  ...base
 };
 
 final Map<String, Function> lazy = {
@@ -132,5 +136,31 @@ final Map<String, Function> lazy = {
     var i = 1;
     Iterable t = List(size).map((_) => BObject(i++)).toList();
     vm.stack.push(BObject(t));
+  }
+};
+
+final Map<String, Function> base = {
+  'when': (BVM vm) {
+    // [cond block] top
+    var block = vm.stack.pop().value as List<Token>;
+    var cond = vm.stack.pop().value as int;
+    (cond > 0) ? vm.executeCode(block) : null;
+  },
+  'if': (BVM vm) {
+    // [cond true-block false-block] top
+    var falseBlock = vm.stack.pop().value as List<Token>;
+    var trueBlock = vm.stack.pop().value as List<Token>;
+    var cond = vm.stack.pop().value as int;
+    (cond > 0) ? vm.executeCode(trueBlock) : vm.executeCode(falseBlock);
+  },
+  'while': (BVM vm) {
+    // [cond-block body-block] top
+    var body = vm.stack.pop().value as List<Token>;
+    var cond = vm.stack.pop().value as List<Token>;
+    while (true) {
+      vm.executeCode(cond);
+      if ((vm.stack.pop().value as int) <= 0) break;
+      vm.executeCode(body);
+    }
   }
 };

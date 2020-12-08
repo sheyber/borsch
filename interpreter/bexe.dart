@@ -10,7 +10,7 @@ class BVM {
   Map<String, BObject> constants;
   Frames frames;
 
-  bool _closures;
+  bool _closures; // Возможны ошибки
 
   BVM({bool closures = false})
       : stack = BStack(),
@@ -74,6 +74,26 @@ class BVM {
         var a = stack.pop().value as int;
         var b = stack.pop().value as int;
         stack.push(BObject(a * b));
+        break;
+      case '-':
+        var b = stack.pop().value as int;
+        var a = stack.pop().value as int;
+        stack.push(BObject(a - b));
+        break;
+      case '/':
+        var b = stack.pop().value as int;
+        var a = stack.pop().value as int;
+        stack.push(BObject(a ~/ b));
+        break;
+      case '>':
+        var b = stack.pop().value as int;
+        var a = stack.pop().value as int;
+        stack.push(BObject((a > b) ? TRUE : FALSE));
+        break;
+      case '<':
+        var b = stack.pop().value as int;
+        var a = stack.pop().value as int;
+        stack.push(BObject((a < b) ? TRUE : FALSE));
         break;
     }
   }

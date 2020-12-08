@@ -1,3 +1,4 @@
+import 'core/block.dart';
 import 'core/frames.dart';
 import 'core/object.dart';
 import 'core/stack.dart';
@@ -9,10 +10,13 @@ class BVM {
   Map<String, BObject> constants;
   Frames frames;
 
-  BVM()
+  bool _closures;
+
+  BVM({bool closures = false})
       : stack = BStack(),
         constants = {},
-        frames = Frames();
+        frames = Frames(),
+        _closures = closures;
 
   void executeCode(List<Token> tokens) {
     for (var i = 0; i < tokens.length; i++) {
@@ -24,7 +28,7 @@ class BVM {
       } else if (current == '[') {
         var body = List<Token>();
         var brks = 1;
-        // i++;
+
         while (i < tokens.length && brks > 0) {
           i++;
           if (tokens[i].value == '[') {
@@ -34,9 +38,13 @@ class BVM {
           }
           body.add(tokens[i]);
         }
-        // body.removeAt(0);
+
         body.removeAt(body.length - 1);
-        stack.push(BObject(body));
+        if (_closures) {
+          stack.push(BlockObject(body, frames.peekFrame()));
+        } else {
+          stack.push(BObject(body));
+        }
       } else if (current == '{') {
         var array = List<BObject>();
         while (i < tokens.length && tokens[++i].value != '}') {

@@ -1,4 +1,5 @@
 import 'bexe.dart';
+import 'core/block.dart';
 import 'core/object.dart';
 import 'lexer.dart';
 
@@ -25,10 +26,22 @@ final Map<String, Function> words = {
   },
   'call': (BVM vm) {
     // [block] top
-    var block = vm.stack.pop().value as List<Token>;
-    vm.frames.pushFrame();
-    vm.executeCode(block);
-    vm.frames.popFrame();
+    var block = vm.stack.pop();
+    if (block is BlockObject) {
+      vm.frames.pushFrame();
+      vm.frames.loadFrame(block.oldScope);
+      vm.executeCode(block.value);
+      vm.frames.popFrame();
+    } else if (block.value is List<Token>) {
+      vm.frames.pushFrame();
+      vm.executeCode(block.value);
+      vm.frames.popFrame();
+    }
+  },
+  'load': (BVM vm) {
+    // [block-scope] top
+    var block = vm.stack.peek() as BlockObject;
+    vm.frames.loadFrame(block.oldScope);
   },
   'list': (BVM vm) {
     // [..n size] top
@@ -98,5 +111,10 @@ final Map<String, Function> words = {
       hash[array[i].value as String] = array[++i];
     }
     vm.stack.push(BObject(hash));
+  },
+  'scope': (BVM vm) {
+    // [block] top
+    var block = vm.stack.pop().value as List<Token>;
+    vm.stack.push(BlockObject(block, vm.frames.peekFrame()));
   }
 };

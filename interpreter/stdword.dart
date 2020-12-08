@@ -1,0 +1,102 @@
+import 'bexe.dart';
+import 'core/object.dart';
+import 'lexer.dart';
+
+final Map<String, Function> words = {
+  'dup': (BVM vm) {
+    vm.stack.push(vm.stack.peek());
+  },
+  'set': (BVM vm) {
+    // [value name] top
+    var name = vm.stack.pop().value as String;
+    var value = vm.stack.pop();
+    vm.frames.setVar(name, value);
+  },
+  'get': (BVM vm) {
+    // [name] top
+    var name = vm.stack.pop().value as String;
+    vm.stack.push(vm.frames.getValueOfVat(name));
+  },
+  'const': (BVM vm) {
+    // [value name] top
+    var name = vm.stack.pop().value as String;
+    var value = vm.stack.pop();
+    vm.constants[name] = value;
+  },
+  'call': (BVM vm) {
+    // [block] top
+    var block = vm.stack.pop().value as List<Token>;
+    vm.frames.pushFrame();
+    vm.executeCode(block);
+    vm.frames.popFrame();
+  },
+  'list': (BVM vm) {
+    // [..n size] top
+    var size = vm.stack.pop().value as int;
+    var newArray = List<BObject>();
+    for (var i = 0; i < size; i++) {
+      newArray.add(vm.stack.pop());
+    }
+    vm.stack.push(BObject(newArray));
+  },
+  'reverse': (BVM vm) {
+    var array = vm.stack.pop().value as List<BObject>;
+    vm.stack.push(BObject(array.reversed.toList()));
+  },
+  'hash': (BVM vm) {
+    // [array] top
+    var array = vm.stack.pop().value as List<BObject>;
+    var hash = Map<String, BObject>();
+    for (var i = 0; i < array.length; i++) {
+      hash[array[i].value as String] = array[++i];
+    }
+    vm.stack.push(BObject(hash));
+  },
+  'map': (BVM vm) {
+    // [array block] top
+    var block = vm.stack.pop().value as List<Token>;
+    var array = vm.stack.pop().value as List<BObject>;
+    var newArray = List<BObject>();
+    for (var item in array) {
+      vm.stack.push(item);
+      vm.executeCode(block);
+      newArray.add(vm.stack.pop());
+    }
+    vm.stack.push(BObject(newArray));
+  },
+  'each': (BVM vm) {
+    // [array block] top
+    var block = vm.stack.pop().value as List<Token>;
+    var array = vm.stack.pop().value as List<BObject>;
+    for (var item in array) {
+      vm.stack.push(item);
+      vm.executeCode(block);
+    }
+  },
+  'range': (BVM vm) {
+    // [size] top
+    var size = vm.stack.pop().value as int;
+    var i = 1;
+    vm.stack.push(BObject(List(size).map((_) => BObject(i++)).toList()));
+  },
+  'of': (BVM vm) {
+    // [array | hash. index] top
+    var indexkey = vm.stack.pop().value;
+    var value = vm.stack.pop().value;
+    if (value is List) {
+      vm.stack.push((value as List<BObject>)[indexkey as int]);
+    } else if (value is Map) {
+      vm.stack.push((value as Map<String, BObject>)[indexkey as String]);
+    }
+  },
+  'object': (BVM vm) {
+    // DRY
+    // [array] top
+    var array = (vm.stack.pop().value as List<BObject>).reversed.toList();
+    var hash = Map<String, BObject>();
+    for (var i = 0; i < array.length; i++) {
+      hash[array[i].value as String] = array[++i];
+    }
+    vm.stack.push(BObject(hash));
+  }
+};

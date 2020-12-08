@@ -129,7 +129,8 @@ final Map<String, Function> words = {
   ...lazy,
   ...base,
   ...io,
-  ...cast
+  ...cast,
+  ...arrayWords
 };
 
 final Map<String, Function> lazy = {
@@ -189,5 +190,29 @@ final Map<String, Function> cast = {
   },
   'to-s': (BVM vm) {
     vm.stack.push(BObject(vm.stack.pop().value.toString()));
+  }
+};
+
+final Map<String, Function> arrayWords = {
+  'push': (BVM vm) {
+    // [array value] top
+    var value = vm.stack.pop();
+    var array = vm.stack.pop().value as List<BObject>;
+    array.add(value);
+    vm.stack.push(BObject(array));
+  },
+  'pop': (BVM vm) {
+    var array = vm.stack.pop().value as List<BObject>;
+    var last = array.removeLast();
+    vm.stack.push(BObject(array));
+    vm.stack.push(last);
+  },
+  'last': (BVM vm) {
+    var array = vm.stack.pop().value as List<BObject>;
+    vm.stack.push(array.last);
+  },
+  'first': (BVM vm) {
+    var array = vm.stack.pop().value as List<BObject>;
+    vm.stack.push(array.first);
   }
 };

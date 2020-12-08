@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'bexe.dart';
 import 'core/block.dart';
 import 'core/object.dart';
@@ -126,7 +128,8 @@ final Map<String, Function> words = {
   },
   ...lazy,
   ...base,
-  ...io
+  ...io,
+  ...cast
 };
 
 final Map<String, Function> lazy = {
@@ -174,5 +177,17 @@ final Map<String, Function> io = {
   'println': (BVM vm) {
     // [value] top
     print(vm.stack.pop());
+  },
+  'input': (BVM vm) {
+    vm.stack.push(BObject(stdin.readLineSync()));
+  }
+};
+
+final Map<String, Function> cast = {
+  'to-i': (BVM vm) {
+    vm.stack.push(BObject(int.parse((vm.stack.pop().value as String))));
+  },
+  'to-s': (BVM vm) {
+    vm.stack.push(BObject(vm.stack.pop().value.toString()));
   }
 };

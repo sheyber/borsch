@@ -116,5 +116,21 @@ final Map<String, Function> words = {
     // [block] top
     var block = vm.stack.pop().value as List<Token>;
     vm.stack.push(BlockObject(block, vm.frames.peekFrame()));
+  },
+  ...lazy
+};
+
+final Map<String, Function> lazy = {
+  'iter': (BVM vm) {
+    // [array] top
+    var array = vm.stack.pop().value as List<BObject>;
+    Iterable t = array;
+    vm.stack.push(BObject(t));
+  },
+  'lrange': (BVM vm) {
+    var size = vm.stack.pop().value as int;
+    var i = 1;
+    Iterable t = List(size).map((_) => BObject(i++)).toList();
+    vm.stack.push(BObject(t));
   }
 };

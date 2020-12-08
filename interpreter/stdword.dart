@@ -125,7 +125,8 @@ final Map<String, Function> words = {
     vm.stack.push(BlockObject(block, vm.frames.peekFrame()));
   },
   ...lazy,
-  ...base
+  ...base,
+  ...io
 };
 
 final Map<String, Function> lazy = {
@@ -166,5 +167,12 @@ final Map<String, Function> base = {
       if ((vm.stack.pop().value as int) <= 0) break;
       vm.executeCode(body);
     }
+  }
+};
+
+final Map<String, Function> io = {
+  'println': (BVM vm) {
+    // [value] top
+    print(vm.stack.pop().value);
   }
 };

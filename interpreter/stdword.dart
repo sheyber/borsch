@@ -173,6 +173,6 @@ final Map<String, Function> base = {
 final Map<String, Function> io = {
   'println': (BVM vm) {
     // [value] top
-    print(vm.stack.pop().value);
+    print(vm.stack.pop());
   }
 };

@@ -4,8 +4,15 @@
 чтобы погрузится в нескучный мир шизы. 
 
 Билд из сорцов(пример на шиндовс(остальные самые додумаются)):
-   dart2native .\cli.dart
-   .\cli.exe
+   dart2native .\cli.dart -o borsch.exe
+   .\borsch.exe
+
+CLI:
+   cli namefile [-keys]
+   cli run 'code' [-keys]
+
+"Hello, World!"
+   .\borsch.exe run "'Hello, World!' println"
 
 --------------------------------------------------------------
 

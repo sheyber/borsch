@@ -5,7 +5,7 @@ class Token {
 }
 
 class Lexer {
-  static final _ignoreSyms = [' ', '\t', '\n'];
+  static final _ignoreSyms = [' ', '\t', '\n', '\r'];
 
   static List<Token> tokenize(String src) {
     var tokens = List<Token>();

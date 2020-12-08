@@ -1,0 +1,7 @@
+
+[ 1 fact set range [ fact get * fact set ] each fact get ] factorial const
+
+'Factorial:' println
+input to-i 
+factorial call 
+to-s ' <3' concat println (120)

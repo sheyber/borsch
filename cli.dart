@@ -1,32 +1,34 @@
+import 'dart:io';
+
 import 'interpreter/bexe.dart';
 import 'interpreter/lexer.dart';
 
-Map _parseArgs(List<String> args) {
-  var interface = {'body': List<String>(), 'keys': List<String>()};
+const KEYS = {'--closures': 'Делает все блоки замыканиями.'};
+
+List<String> _parseKeys(List<String> args) {
+  var keys = List<String>();
   for (var arg in args) {
     if (arg.startsWith('-')) {
-      interface['keys'].add(arg);
-    } else {
-      interface['body'].add(arg);
+      keys.add(arg);
     }
   }
-  return interface;
+  return keys;
 }
 
 main(List<String> args) {
-  var cli = _parseArgs(args);
-  var closures = false;
-  String type;
-  for (var key in cli['keys']) {
-    if (key == '--closures')
-      closures = true;
-    else if (key == '-e') {
-      type = 'e';
+  if (args.length > 0) {
+    var keys = _parseKeys(args);
+    if (args[0] == 'run') {
+      _evalCode(args[1], closures: keys.contains('--closures'));
+    } else {
+      var content = File(args[0]).readAsStringSync();
+      _evalCode(content, closures: keys.contains('--closures'));
     }
-  }
-  // eval
-  if (type == 'e') {
-    _evalCode(cli['body'].last, closures: closures);
+  } else {
+    print("Борщленг. ГыГ.");
+    KEYS.forEach((key, value) {
+      print('\t$key | $value');
+    });
   }
 }
 

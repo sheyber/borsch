@@ -1,0 +1,6 @@
+
+( --closures and without --closures )
+
+[ 1 2 3 ] dup
+println
+scope println

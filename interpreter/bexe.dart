@@ -5,6 +5,7 @@ import 'core/stack.dart';
 import 'lexer.dart';
 import 'stdword.dart';
 
+// Виртуальная машина борщленга
 class BVM {
   BStack stack;
   Map<String, BObject> constants;
@@ -22,10 +23,13 @@ class BVM {
     for (var i = 0; i < tokens.length; i++) {
       var current = tokens[i].value;
       if (current.startsWith(RegExp(r'[0-9]'))) {
+        // оброботка чисел
         stack.push(BObject(int.parse(current)));
       } else if (current.startsWith('\'')) {
+        // оброботка строк
         stack.push(BObject(current.replaceFirst('\'', '')));
       } else if (current == '[') {
+        // оброботка блока
         var body = List<Token>();
         var brks = 1;
 
@@ -46,18 +50,21 @@ class BVM {
           stack.push(BObject(body));
         }
       } else if (current == '{') {
+        // оброботка массива
         var array = List<BObject>();
         while (i < tokens.length && tokens[++i].value != '}') {
           array.add(_evalAsBObject(tokens[i].value));
         }
         stack.push(BObject(array));
       } else if (current.startsWith(RegExp(r'[a-zA-z]'))) {
+        // оброботка слов
         if (constants.containsKey(current)) {
           stack.push(constants[current]);
         } else {
           executeWord(current);
         }
       } else {
+        // оброботка символов
         executeSym(current);
       }
     }

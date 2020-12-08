@@ -3,6 +3,10 @@ import 'core/block.dart';
 import 'core/object.dart';
 import 'lexer.dart';
 
+/*
+  Builtin слова
+*/
+
 const TRUE = 1;
 const FALSE = 0;
 

@@ -130,6 +130,12 @@ final Map<String, Function> words = {
     var cond = vm.stack.pop().value as int;
     vm.stack.push(BObject((cond > 0) ? 0 : 1));
   },
+  'assert': (BVM vm) {
+    var cond = vm.stack.pop().value as int;
+    if (cond <= 0) {
+      throw 'ErrorAssert';
+    }
+  },
   ...lazy,
   ...base,
   ...io,
@@ -187,6 +193,9 @@ final Map<String, Function> io = {
   },
   'input': (BVM vm) {
     vm.stack.push(BObject(stdin.readLineSync()));
+  },
+  'print': (BVM vm) {
+    stdout.write(vm.stack.pop().value);
   }
 };
 

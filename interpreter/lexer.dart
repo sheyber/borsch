@@ -18,6 +18,13 @@ class Lexer {
           value += src[i];
         }
         tokens.add(Token(value));
+      } else if (src[i][0] == '#') {
+        var value = '#';
+        i++;
+        while (i < src.length && src[++i][0] != '\'') {
+          value += src[i];
+        }
+        tokens.add(Token(value));
       } else if (!_ignoreSyms.contains(src[i][0])) {
         var value = '';
         while (i < src.length && !_ignoreSyms.contains(src[i][0])) {

@@ -30,6 +30,9 @@ class BVM {
       } else if (current.startsWith('\'')) {
         // оброботка строк
         stack.push(BObject(current.replaceFirst('\'', '')));
+      } else if (current.startsWith('#')) {
+        var toks = Lexer.tokenize(current.replaceFirst('#', ''));
+        executeCode(toks);
       } else if (current == '[') {
         // оброботка блока
         var body = List<Token>();
@@ -130,10 +133,15 @@ class BVM {
   }
 
   BObject _evalAsBObject(String t) {
+    t = t.trim();
     if (t.startsWith(RegExp(r'[0-9]'))) {
       return BObject(int.parse(t));
     } else if (t.startsWith('\'')) {
       return BObject(t.replaceFirst('\'', ''));
+    } else if (t.startsWith('#')) {
+      var toks = Lexer.tokenize(t.replaceFirst('#', ''));
+      executeCode(toks);
+      return stack.pop();
     }
     return BObject(t);
   }

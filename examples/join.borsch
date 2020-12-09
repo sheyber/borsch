@@ -1,0 +1,4 @@
+
+[ sep set '' s set [ sep get s get concat concat s set ] each s get ] join const
+
+'lox pox' split '-' join call println

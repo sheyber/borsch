@@ -191,11 +191,15 @@ final Map<String, Function> cast = {
   },
   'to-s': (BVM vm) {
     vm.stack.push(BObject(vm.stack.pop().value.toString()));
+  },
+  'to-arr': (BVM vm) {
+    var str = vm.stack.pop().value as String;
+    vm.stack.push(BObject(str.split('').map((e) => BObject(e)).toList()));
   }
 };
 
 final Map<String, Function> arrayWords = {
-  'push': (BVM vm) {
+  'append': (BVM vm) {
     // [array value] top
     var value = vm.stack.pop();
     var array = vm.stack.pop().value as List<BObject>;
@@ -224,5 +228,39 @@ final Map<String, Function> stringWords = {
     var str2 = vm.stack.pop().value as String;
     var str1 = vm.stack.pop().value as String;
     vm.stack.push(BObject(str1 + str2));
+  },
+  'each-char': (BVM vm) {
+    var block = vm.stack.pop().value as List<Token>;
+    var str = vm.stack.pop().value as String;
+    for (var i = 0; i < str.length; i++) {
+      vm.stack.push(BObject(str[i]));
+      vm.executeCode(block);
+    }
+  },
+  'map-char': (BVM vm) {
+    var block = vm.stack.pop().value as List<Token>;
+    var str = vm.stack.pop().value as String;
+    var newStr = '';
+    for (var i = 0; i < str.length; i++) {
+      vm.stack.push(BObject(str[i]));
+      vm.executeCode(block);
+      newStr += vm.stack.pop().value as String;
+    }
+    vm.stack.push(BObject(newStr));
+  },
+  'eq': (BVM vm) {
+    // [string string] top
+    var str = vm.stack.pop().value as String;
+    var str2 = vm.stack.pop().value as String;
+    vm.stack.push(BObject((str2 == str) ? TRUE : FALSE));
+  },
+  'len': (BVM vm) {
+    // [string] top
+    var str = vm.stack.pop().value as String;
+    vm.stack.push(BObject(str.length));
+  },
+  'split': (BVM vm) {
+    var str = vm.stack.pop().value as String;
+    vm.stack.push(BObject(str.split(' ').map((e) => BObject(e)).toList()));
   }
 };

@@ -10,6 +10,7 @@ class BVM {
   BStack stack;
   Map<String, BObject> constants;
   Frames frames;
+  Map<String, BlockObject> words_;
 
   bool _closures; // Возможны ошибки
 
@@ -17,6 +18,7 @@ class BVM {
       : stack = BStack(),
         constants = {},
         frames = Frames(),
+        words_ = {},
         _closures = closures;
 
   void executeCode(List<Token> tokens) {
@@ -56,10 +58,24 @@ class BVM {
           array.add(_evalAsBObject(tokens[i].value));
         }
         stack.push(BObject(array));
+      } else if (current == ':') {
+        var name = tokens[++i].value;
+        var body = List<Token>();
+        i++;
+        while (i < tokens.length && tokens[i].value != ';') {
+          body.add(tokens[i++]);
+        }
+        words_[name] = BlockObject(body, frames.peekFrame());
       } else if (current.startsWith(RegExp(r'[a-zA-z]'))) {
         // оброботка слов
         if (constants.containsKey(current)) {
           stack.push(constants[current]);
+        } else if (words_.containsKey(current)) {
+          var block = words_[current];
+          frames.pushFrame();
+          frames.loadFrame(block.oldScope);
+          executeCode(block.value as List<Token>);
+          frames.popFrame();
         } else {
           executeWord(current);
         }

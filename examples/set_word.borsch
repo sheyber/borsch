@@ -1,0 +1,5 @@
+
+: join sep set '' s set [ sep get s get concat concat s set ] each s get ;
+: sqrt dup * ;
+
+10 range [ sqrt to-s ] map reverse ' ' join println

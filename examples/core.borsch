@@ -1,0 +1,11 @@
+
+: eval lex execute-code ;
+
+: join ( array -- string )
+   sep set 
+   '' s set
+   [ sep get s get concat concat s set ] each
+   s get ;
+
+: repl 
+   [ input dup 'exit' eq not ] [ eval ] while ;

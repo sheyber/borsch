@@ -126,12 +126,17 @@ final Map<String, Function> words = {
     var block = vm.stack.pop().value as List<Token>;
     vm.stack.push(BlockObject(block, vm.frames.peekFrame()));
   },
+  'not': (BVM vm) {
+    var cond = vm.stack.pop().value as int;
+    vm.stack.push(BObject((cond > 0) ? 0 : 1));
+  },
   ...lazy,
   ...base,
   ...io,
   ...cast,
   ...arrayWords,
-  ...stringWords
+  ...stringWords,
+  ...interpreter
 };
 
 final Map<String, Function> lazy = {
@@ -262,5 +267,18 @@ final Map<String, Function> stringWords = {
   'split': (BVM vm) {
     var str = vm.stack.pop().value as String;
     vm.stack.push(BObject(str.split(' ').map((e) => BObject(e)).toList()));
+  }
+};
+
+final Map<String, Function> interpreter = {
+  'lex': (BVM vm) {
+    // [source] top
+    var str = vm.stack.pop().value as String;
+    vm.stack.push(BObject(Lexer.tokenize(str).map((e) => BObject(e)).toList()));
+  },
+  'execute-code': (BVM vm) {
+    var botoks = vm.stack.pop().value as List<BObject>;
+    List<Token> tokens = botoks.map((e) => e.value as Token).toList();
+    vm.executeCode(tokens);
   }
 };

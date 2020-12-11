@@ -1,5 +1,5 @@
 
-![lol](./misc/soup.png)
+![lol](./misc/.soup.png)
 
 # borsch language / язык программирования для борщей
 

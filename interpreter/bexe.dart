@@ -121,6 +121,11 @@ class BVM {
         var a = stack.pop().value as int;
         stack.push(BObject((a < b) ? TRUE : FALSE));
         break;
+      case '=':
+        var b = stack.pop().value as int;
+        var a = stack.pop().value as int;
+        stack.push(BObject((a == b) ? TRUE : FALSE));
+        break;
     }
   }
 

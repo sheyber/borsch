@@ -16,6 +16,12 @@ final Map<String, Function> words = {
   'dup': (BVM vm) {
     vm.stack.push(vm.stack.peek());
   },
+  'swap': (BVM vm) {
+    var a = vm.stack.pop();
+    var b = vm.stack.pop();
+    vm.stack.push(a);
+    vm.stack.push(b);
+  },
   'set': (BVM vm) {
     // [value name] top
     var name = vm.stack.pop().value as String;
@@ -64,6 +70,27 @@ final Map<String, Function> words = {
   'reverse': (BVM vm) {
     var array = vm.stack.pop().value as List<BObject>;
     vm.stack.push(BObject(array.reversed.toList()));
+  },
+  'sort': (BVM vm) {
+    var array = vm.stack.pop().value as List<BObject>;
+    var time = array.map((e) => e.value).toList();
+    time.sort();
+    array = time.toList().map((e) => BObject(e)).toList();
+    vm.stack.push(BObject(array));
+  },
+  'filter': (BVM vm) {
+    // [array block]
+    var block = vm.stack.pop().value as List<Token>;
+    var array = vm.stack.pop().value as List<BObject>;
+    var newArray = List<BObject>();
+    for (var item in array) {
+      vm.stack.push(item);
+      vm.executeCode(block);
+      if ((vm.stack.pop().value as int) > 0) {
+        newArray.add(item);
+      }
+    }
+    vm.stack.push(BObject(newArray));
   },
   'hash': (BVM vm) {
     // [array] top
